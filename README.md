@@ -1,4 +1,4 @@
-https://travis-ci.com/mikenac/jwt_authenticator.svg?branch=master
+[![Build Status](https://travis-ci.com/mikenac/jwt_authenticator.svg?branch=master)](https://travis-ci.com/mikenac/jwt_authenticator)
 
 # jwt_authenticator
 
