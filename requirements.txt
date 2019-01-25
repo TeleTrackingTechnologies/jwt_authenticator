@@ -5,3 +5,4 @@ tqdm
 twine
 python-jose
 pylint
+coverage
