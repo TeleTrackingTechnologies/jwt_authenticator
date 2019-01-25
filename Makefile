@@ -17,6 +17,10 @@ help:
 	@echo "		run lint only"
 	@echo "make dep"
 	@echo "		dump the current pip packages to requirements.txt"
+	@echo "make pagkage"
+	@echo "         bump the build version by 1 and create packages"
+	@echo "make dist"
+	@echo "         push package to PyPi"
 	@echo "make clean"
 	@echo "		clean compiled files and the virtual environment"
 
@@ -50,11 +54,13 @@ package:
 	@$(VENV)/bin/bumpversion --config-file .bumpversion.cfg patch
 	@$(VENV)/bin/python setup.py bdist_wheel
 
+dist:
+	@$(VENV)/bin/twine upload dist/*
 clean:
 	@rm -rf $(VENV)
 	@find . -name "*.pyc" -delete
 	@find . -name "*.pyo" -delete
 	@find . -name .coverage -delete
 
-.PHONY: init test lint dep package
+.PHONY: init test lint dep package dist
 
