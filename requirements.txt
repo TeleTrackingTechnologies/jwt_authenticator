@@ -1,0 +1,6 @@
+flask
+setuptools
+wheel
+tqdm
+twine
+python-jose

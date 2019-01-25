@@ -1,0 +1,2 @@
+SECRET = "foobar"
+AUDIENCE = "fred"
