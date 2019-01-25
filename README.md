@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/TeleTrackingTechnologies/jwt_authenticator.svg?branch=master)](https://travis-ci.com/TeleTrackingTechnologies/jwt_authenticator)
+[![Build Status](https://travis-ci.com/TeleTrackingTechnologies/jwt_authenticator.svg?branch=master)](https://travis-ci.com/TeleTrackingTechnologies/jwt_authenticator)[![PyPI version](https://badge.fury.io/py/jwt-authenticator.svg)](https://badge.fury.io/py/jwt-authenticator)
 # jwt_authenticator
 
 jwt_authenticator is a simply python library for adding JWT token authentication/authorization in flask web sites/services. It controls access either by checking for just a validated token, or optionally, a single role claim from the token. Access is controlled by decorating the endpoint functions with an attribute.
@@ -8,7 +8,7 @@ jwt_authenticator is a simply python library for adding JWT token authentication
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install jwt_authenticator.
 
 ```bash
-pip install jwt_authenticator
+pip install jwt-authenticator
 ```
 
 ## Usage
