@@ -54,7 +54,7 @@ is called.
 ### Environment Variables
 
 * JWT_SECRET - will override SECRET
-* JWT_AUDIENCE - will override AUDIIENCE
+* JWT_AUDIENCE - will override AUDIENCE
 
 
 ## Contributing

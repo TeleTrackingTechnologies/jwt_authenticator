@@ -7,7 +7,7 @@ setuptools.setup(
     name='jwt_authenticator',
     version='0.1',
     author="Mike Nacey",
-    author_email="mike-nacey.iet@teletracking.com",
+    author_email="nobody@teletracking.com",
     description="Simple JWT token flask service security library.",
     long_description=long_description,
     long_description_content_type="text/markdown",
