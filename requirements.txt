@@ -6,3 +6,4 @@ twine
 python-jose
 pylint
 coverage
+bumpversion
