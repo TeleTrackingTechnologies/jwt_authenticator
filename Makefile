@@ -47,6 +47,7 @@ dep:
 	@$(VENV)/bin/pip freeze > requirements.txt
 
 package:
+	@$(VENV)/bin/bumpversion --config-file .bumpversion.cfg patch
 	@$(VENV)/bin/python setup.py bdist_wheel
 
 clean:
