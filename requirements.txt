@@ -4,4 +4,4 @@ wheel
 tqdm
 twine
 python-jose
-
+pylint
