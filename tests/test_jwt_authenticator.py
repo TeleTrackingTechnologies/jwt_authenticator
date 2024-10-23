@@ -4,7 +4,10 @@ import unittest
 import secrets
 from jwt_authenticator.authentication_handler import AuthenticationHandler, AuthError
 from flask import Flask
-
+from jwt.api_jwk import PyJWK
+from key_utils import public_key, private_key
+from jwt.utils import base64url_encode
+import json
 
 class JwtAuthenticatorTests(unittest.TestCase):
     """ Test fixture for application unit tests"""
@@ -45,7 +48,8 @@ class JwtAuthenticatorTests(unittest.TestCase):
         roles = {'role': ['admin', 'user'], 'aud': audience}
         secret = secrets.token_urlsafe(32)
 
-        token = AuthenticationHandler.generate_auth_token(roles, secret, algorithm="HS512")
+        token = AuthenticationHandler.generate_auth_token(roles, secret,
+                                                          algorithm="HS512")
         decoded_token = AuthenticationHandler.validate_and_decode_token(
             token=token, key=secret,
             audience=audience, algorithms=["HS512"]
@@ -123,6 +127,43 @@ class JwtAuthenticatorTests(unittest.TestCase):
                 token=token, key=secret,
                 audience=audience1)
 
+    def test_get_jwks_token_signer(self):
+        """ Test getting a key issuer from a public URL """
+
+        pubkey_n = base64url_encode(
+            public_key.public_numbers().n.to_bytes(
+                (public_key.key_size + 7) // 8, 'big'))
+        pubkey_e = base64url_encode(
+                public_key.public_numbers().e.to_bytes(4, 'big'))
+
+        jwk = {
+            "kty": "RSA",
+            "kid": "kid1",
+            "use": "sig",
+            "alg": "RS256",
+            "n": pubkey_n.decode("utf-8"),
+            "e": pubkey_e.decode("utf-8")
+        }
+        keys = {
+            "keys": [jwk, ]
+        }
+        with open('keys.json', 'w') as f:
+            json.dump(keys, f)
+
+        key_path = os.getcwd() + "/keys.json"
+        print("KEY_PATH=" + key_path)
+
+        jwks_url = f"file://{key_path}"
+        audience = 'http://www.service.wingdings.com/'
+        roles = {'role': ['admin', 'user'], 'aud': audience}
+        token = AuthenticationHandler.generate_auth_token(roles, private_key, "RS256",
+                                                          headers={"kid": "kid1"})
+
+        key = AuthenticationHandler.get_jwks_signing_key(jwks_url, token)
+        claims = AuthenticationHandler.validate_and_decode_token(token, key.key,
+                                                                 audience=audience)
+        self.assertTrue(claims)
+
     def test_environment_variables_override_config(self):
         """ Specified environment variable settings should override default module config"""
 
@@ -134,17 +175,22 @@ class JwtAuthenticatorTests(unittest.TestCase):
 
         os.environ["JWT_SECRET"] = "sed"
         os.environ["JWT_AUDIENCE"] = "larry"
+        os.environ["JWKS_URL"] = "http://foo.bar"
 
         AuthenticationHandler.load_configuration()
 
         try:
             self.assertTrue(app.config["SECRET"] == "sed", "Secret does not match")
-            self.assertTrue(app.config["AUDIENCE"] == "larry", "Audience does not match")
+            self.assertTrue(app.config["AUDIENCE"] == "larry",
+                            "Audience does not match")
+            self.assertTrue(app.config["JWKS_URL"] == "http://foo.bar",
+                            "JWKS url not match")
         finally:
             ctx.pop()
 
     def test_config_from_file(self):
-        """ Specified environment variable settings should override default module config"""
+        """ Specified environment variable settings should override default module
+        config"""
 
         app = Flask('test.cfg')
         app.config.from_pyfile(f"{self.this_path}/config.py")
@@ -156,7 +202,7 @@ class JwtAuthenticatorTests(unittest.TestCase):
         try:
             self.assertTrue(app.config["SECRET"] == "foobar", "Secret does not match")
             self.assertTrue(app.config["AUDIENCE"] == "fred", "Audience does not match")
+            self.assertTrue(app.config["JWKS_URL"] == "http://bar.foo",
+                            "JWKS url not match")
         finally:
             ctx.pop()
-
-

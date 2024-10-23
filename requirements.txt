@@ -7,3 +7,5 @@ python-jose
 pylint
 coverage
 bumpversion
+pyjwt
+cryptography
