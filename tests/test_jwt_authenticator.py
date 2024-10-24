@@ -1,13 +1,15 @@
-import os
 import datetime
-import unittest
-import secrets
-from jwt_authenticator.authentication_handler import AuthenticationHandler, AuthError
-from flask import Flask
-from jwt.api_jwk import PyJWK
-from key_utils import public_key, private_key
-from jwt.utils import base64url_encode
 import json
+import os
+import secrets
+import unittest
+
+from flask import Flask
+from jwt.utils import base64url_encode
+
+from jwt_authenticator.authentication_handler import AuthenticationHandler, AuthError
+from key_utils import public_key, private_key
+
 
 class JwtAuthenticatorTests(unittest.TestCase):
     """ Test fixture for application unit tests"""
@@ -28,24 +30,36 @@ class JwtAuthenticatorTests(unittest.TestCase):
 
     def test_generate_and_validate_token_success(self):
         """ Generate and decode a token"""
+        app = Flask('test.cfg')
+        app.config.from_pyfile(f"{self.this_path}/config.py")
+
+        ctx = app.app_context()
+        ctx.push()
 
         audience = 'http://www.service.wingdings.com/'
-        roles = {'role': ['admin', 'user'], 'aud': audience}
+        roles = {'group': ['admin', 'user'], 'aud': audience}
         secret = secrets.token_urlsafe(32)
 
         token = AuthenticationHandler.generate_auth_token(roles, secret)
         decoded_token = AuthenticationHandler.validate_and_decode_token(
             token=token, key=secret,
-            audience=audience
+            audience=audience,
+            algorithms=["HS256"]
         )
-        self.assertTrue(decoded_token['role'][0] == 'admin')
-        self.assertTrue(decoded_token['role'][1] == 'user')
+        self.assertTrue(decoded_token['group'][0] == 'admin')
+        self.assertTrue(decoded_token['group'][1] == 'user')
 
     def test_generate_and_validate_token_512_success(self):
         """ Generate and decode a token using a different algorithm"""
 
+        app = Flask('test.cfg')
+        app.config.from_pyfile(f"{self.this_path}/config.py")
+
+        ctx = app.app_context()
+        ctx.push()
+
         audience = 'http://www.service.wingdings.com/'
-        roles = {'role': ['admin', 'user'], 'aud': audience}
+        roles = {'group': ['admin', 'user'], 'aud': audience}
         secret = secrets.token_urlsafe(32)
 
         token = AuthenticationHandler.generate_auth_token(roles, secret,
@@ -54,14 +68,14 @@ class JwtAuthenticatorTests(unittest.TestCase):
             token=token, key=secret,
             audience=audience, algorithms=["HS512"]
         )
-        self.assertTrue(decoded_token['role'][0] == 'admin')
-        self.assertTrue(decoded_token['role'][1] == 'user')
+        self.assertTrue(decoded_token['group'][0] == 'admin')
+        self.assertTrue(decoded_token['group'][1] == 'user')
 
     def test_validate_token_expired(self):
         """ Expired tokens should throw exceptions"""
 
         audience = 'http://www.service.wingdings.com/'
-        roles = {'role': ['admin', 'user'], 'aud': audience,
+        roles = {'group': ['admin', 'user'], 'aud': audience,
                  'exp': datetime.datetime.utcnow() - datetime.timedelta(minutes=15)}
         secret = secrets.token_urlsafe(32)
 
@@ -76,7 +90,7 @@ class JwtAuthenticatorTests(unittest.TestCase):
         """ A role is specified and not matched"""
 
         audience = 'http://www.service.wingdings.com/'
-        roles = {'role': ['admin', 'user'], 'aud': audience}
+        roles = {'group': ['admin', 'user'], 'aud': audience}
         secret = secrets.token_urlsafe(32)
 
         token = AuthenticationHandler.generate_auth_token(roles, secret)
@@ -88,16 +102,22 @@ class JwtAuthenticatorTests(unittest.TestCase):
     def test_validate_token_role_match(self):
         """ A role is specified and matched """
 
+        app = Flask('test.cfg')
+        app.config.from_pyfile(f"{self.this_path}/config.py")
+
+        ctx = app.app_context()
+        ctx.push()
+
         audience = 'http://www.service.wingdings.com/'
-        roles = {'role': ['admin', 'user'], 'aud': audience}
+        roles = {'group': ['admin', 'user'], 'aud': audience}
         secret = secrets.token_urlsafe(32)
 
         token = AuthenticationHandler.generate_auth_token(roles, secret)
         decoded_token = AuthenticationHandler.validate_and_decode_token(
             token=token, key=secret, role_name="admin",
             audience=audience)
-        self.assertTrue(decoded_token['role'][0] == 'admin')
-        self.assertTrue(decoded_token['role'][1] == 'user')
+        self.assertTrue(decoded_token['group'][0] == 'admin')
+        self.assertTrue(decoded_token['group'][1] == 'user')
 
     def test_invalid_token_secret_mismatch(self):
         """ Make sure invalid tokens are rejected"""
@@ -130,6 +150,12 @@ class JwtAuthenticatorTests(unittest.TestCase):
     def test_get_jwks_token_signer(self):
         """ Test getting a key issuer from a public URL """
 
+        app = Flask('test.cfg')
+        app.config.from_pyfile(f"{self.this_path}/config.py")
+
+        ctx = app.app_context()
+        ctx.push()
+
         pubkey_n = base64url_encode(
             public_key.public_numbers().n.to_bytes(
                 (public_key.key_size + 7) // 8, 'big'))
@@ -155,12 +181,12 @@ class JwtAuthenticatorTests(unittest.TestCase):
 
         jwks_url = f"file://{key_path}"
         audience = 'http://www.service.wingdings.com/'
-        roles = {'role': ['admin', 'user'], 'aud': audience}
+        roles = {'group': ['admin', 'user'], 'aud': audience}
         token = AuthenticationHandler.generate_auth_token(roles, private_key, "RS256",
                                                           headers={"kid": "kid1"})
 
         key = AuthenticationHandler.get_jwks_signing_key(jwks_url, token)
-        claims = AuthenticationHandler.validate_and_decode_token(token, key.key,
+        claims = AuthenticationHandler.validate_and_decode_token(token, key,
                                                                  audience=audience)
         self.assertTrue(claims)
 
@@ -177,7 +203,7 @@ class JwtAuthenticatorTests(unittest.TestCase):
         os.environ["JWT_AUDIENCE"] = "larry"
         os.environ["JWKS_URL"] = "http://foo.bar"
 
-        AuthenticationHandler.load_configuration()
+        AuthenticationHandler.load_configuration(app)
 
         try:
             self.assertTrue(app.config["SECRET"] == "sed", "Secret does not match")
@@ -197,7 +223,7 @@ class JwtAuthenticatorTests(unittest.TestCase):
 
         ctx = app.app_context()
         ctx.push()
-        AuthenticationHandler.load_configuration()
+        AuthenticationHandler.load_configuration(app)
 
         try:
             self.assertTrue(app.config["SECRET"] == "foobar", "Secret does not match")

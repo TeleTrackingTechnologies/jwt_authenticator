@@ -17,7 +17,7 @@ help:
 	@echo "		run lint only"
 	@echo "make dep"
 	@echo "		dump the current pip packages to requirements.txt"
-	@echo "make pagkage"
+	@echo "make package"
 	@echo "         bump the build version by 1 and create packages"
 	@echo "make dist"
 	@echo "         push package to PyPi"

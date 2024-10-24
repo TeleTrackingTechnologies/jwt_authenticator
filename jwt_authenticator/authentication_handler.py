@@ -1,8 +1,10 @@
 """ JWT authentication handler for Flask web services"""
 import os
 from functools import wraps
-from flask import g, request, current_app as app
+
 import jwt
+from flask import abort
+from flask import g, request, current_app as app
 from jwt import PyJWKClient, PyJWK
 
 
@@ -19,7 +21,7 @@ class AuthenticationHandler:
     """ Basic JWT authentication handler """
 
     @staticmethod
-    def load_configuration():
+    def load_configuration(flask_app):
         """ Load configuration from environment variables if set. The application configuration
         values: SECRET and AUDIENCE are expected for this module to work properly.
         Environment variables will override what has already been set in the application config
@@ -28,18 +30,26 @@ class AuthenticationHandler:
         This method should be called during your application's construction.
          """
 
+        if "GROUPS_CLAIM" not in flask_app.config:
+            flask_app.config["GROUPS_CLAIM"] = "groups"
+
+
         env_secret = os.getenv('JWT_SECRET')
         env_audience = os.getenv('JWT_AUDIENCE')
         env_jwks_url = os.getenv('JWKS_URL')
+        env_groups_claim = os.getenv('GROUPS_CLAIM')
 
         if env_secret:
-            app.config['SECRET'] = env_secret
+            flask_app.config['SECRET'] = env_secret
 
         if env_audience:
-            app.config['AUDIENCE'] = env_audience
+            flask_app.config['AUDIENCE'] = env_audience
 
         if env_jwks_url:
-            app.config['JWKS_URL'] = env_jwks_url
+            flask_app.config['JWKS_URL'] = env_jwks_url
+
+        if env_groups_claim:
+            flask_app.config['GROUPS_CLAIM'] = env_groups_claim
 
     @staticmethod
     def generate_auth_token(role_claims, key, algorithm='HS256', headers=None):
@@ -71,7 +81,7 @@ class AuthenticationHandler:
                 audience=audience,
                 algorithms=algorithms)
 
-            roles = claim_set["role"]
+            roles = claim_set[app.config["GROUPS_CLAIM"]]
             if role_name:
                 matching_roles = list(
                     filter(lambda x: x.lower() == role_name.lower(), roles))
@@ -92,7 +102,7 @@ class AuthenticationHandler:
                              f"invalid token: {ex}"}, 401) from ex
         except AuthError:
             raise
-
+        # pylint: disable=broad-exception-caught
         except Exception as ex:
             raise AuthError({"code": "unknown error",
                              "description":
@@ -104,26 +114,35 @@ class AuthenticationHandler:
     def requires_auth(role_name=None):
         """ Validate access token """
 
-        def auth_decorator(func):
+        def auth_decorator(func):          # pragma: no cover
             @wraps(func)
             def func_wrapper(*args, **kwargs):
-                token = request.headers.get("Authorization", None)
+                try:
+                    token = request.headers.get("Authorization", None)
+                    if not token:
+                        abort(401, description="No token")
 
-                if app.config["JWKS_URL"]:
-                    key = AuthenticationHandler.get_jwks_signing_key(
-                        app.config["JWKS_URL"],
-                        token
-                    )
-                else:
-                    key = app.config['SECRET']
-                claim_set = \
-                    AuthenticationHandler.validate_and_decode_token(
-                        token,
-                        key,
-                        app.config['AUDIENCE'],
-                        role_name)
-                # if we want to store claim-set in application context
-                g.current_user = claim_set
+                    if "JWKS_URL" in app.config:
+                        key = AuthenticationHandler.get_jwks_signing_key(
+                            app.config["JWKS_URL"],
+                            token
+                        ).key
+                    else:
+                        key = app.config['SECRET']
+                    claim_set = \
+                        AuthenticationHandler.validate_and_decode_token(
+                            token,
+                            key,
+                            app.config['AUDIENCE'],
+                            role_name)
+                    # if we want to store claim-set in application context
+                    g.current_user = claim_set
+                except AuthError as ex:
+                    abort(ex.status_code, description=ex.error)
+                # pylint: disable=broad-exception-caught
+                except Exception as ex:
+                    abort(500,
+                          description=f"Unknown error. {ex}")
                 return func(*args, **kwargs)
 
             return func_wrapper
