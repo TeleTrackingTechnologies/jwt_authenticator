@@ -10,11 +10,12 @@ jobs:
       - uses: actions/checkout@v2
       - name: Bump version and push tag
         run: |
+          make init
           make version
         env:
           GITHUB_TOKEN: ${{ secrets.TELECI_GITHUB_TOKEN }}
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.TELECI_GITHUB_TOKEN }}
           tags: true
