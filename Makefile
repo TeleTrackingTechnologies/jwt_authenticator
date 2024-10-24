@@ -1,5 +1,6 @@
-VIRTUALENV = virtualenv --python=python3
+
 VENV_DIR = .venv
+VIRTUALENV = python3 -m venv $(VENV_DIR)
 VENV := $(if $(VIRTUAL_ENV),$(VIRTUAL_ENV),$(VENV_DIR))
 PYTHON = $(VENV)/bin/python
 REQ_STAMP = $(VENV)/.req_stamp
