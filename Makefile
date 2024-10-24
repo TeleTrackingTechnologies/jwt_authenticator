@@ -51,8 +51,10 @@ test: init lint
 dep:
 	@$(VENV)/bin/pip freeze > requirements.txt
 
-package:
+version:
 	@$(VENV)/bin/bumpversion --config-file .bumpversion.cfg patch
+
+package:
 	@$(VENV)/bin/python setup.py bdist_wheel
 
 dist:
