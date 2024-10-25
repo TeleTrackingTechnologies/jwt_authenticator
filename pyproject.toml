@@ -5,7 +5,7 @@ build-backend = 'setuptools.build_meta'
 
 [project]
 name = "jwt-authenticator"
-version = "1.0.4"
+version = "1.0.5"
 authors = [{ name = "Mike Nacey", email = "nobody@teletracking.com"}]
 description = "Simple JWT token flask service security library."
 readme = "README.md"
