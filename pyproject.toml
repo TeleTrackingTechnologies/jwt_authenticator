@@ -24,8 +24,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["bumpversion"]
-test = ["pylint", "coverage"]
+RSA = ["cryptography>42.0.0"]
 
 [project.urls]
 "Source" = "https://github.com/TeleTrackingTechnologies/jwt_authenticator"

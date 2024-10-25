@@ -33,7 +33,6 @@ class AuthenticationHandler:
         if "GROUPS_CLAIM" not in flask_app.config:
             flask_app.config["GROUPS_CLAIM"] = "groups"
 
-
         env_secret = os.getenv('JWT_SECRET')
         env_audience = os.getenv('JWT_AUDIENCE')
         env_jwks_url = os.getenv('JWKS_URL')
@@ -99,7 +98,7 @@ class AuthenticationHandler:
         except jwt.InvalidTokenError as ex:
             raise AuthError({"code": "Invalid token",
                              "description":
-                             f"invalid token: {ex}"}, 401) from ex
+                                 f"invalid token: {ex}"}, 401) from ex
         except AuthError:
             raise
         # pylint: disable=broad-exception-caught
@@ -114,7 +113,7 @@ class AuthenticationHandler:
     def requires_auth(role_name=None):
         """ Validate access token """
 
-        def auth_decorator(func):          # pragma: no cover
+        def auth_decorator(func):  # pragma: no cover
             @wraps(func)
             def func_wrapper(*args, **kwargs):
                 try:

@@ -12,15 +12,20 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install jwt_aut
 pip install jwt-authenticator
 ```
 
+If using RS256, you must also:
+```bash
+pip install cryptography
+```
+
 ## Usage
 In the main application initialization area
 
 ```python
-from Flask import Flask
+from flask import Flask
 from jwt_authenticator import AuthenticationHandler
 
 APP = Flask(__name__)
-AuthenticationHandler.load_configuration()
+AuthenticationHandler.load_configuration(APP)
 ```
 In the endpoints
 
@@ -42,20 +47,23 @@ def get_one(name):
 jwt_authenticator requires two configuration values to work. These can be specified either in the normal Flask application configuration or as environment variables. Environment variable values will override application configuration values, when
 
 ```python
-AuthenticationHanlder.load_configuration()
+AuthenticationHanlder.load_configuration(app)
 ```
 is called.
 
 ### APP.config (i.e. flask application configuration)
 
-* SECRET - the key used to sign the JWT token
+* SECRET - the key used to sign the JWT token. Option if JWKS_URL specified.
 * AUDIENCE - the audience claim used in the JWT token
+* JKWS_URL - [OPTIONAL] OIDC key discovery URL
+* GROUPS_CLAIM - [OPTIONAL] which claim has the list of groups. Defaults to "groups"
 
 ### Environment Variables
 
 * JWT_SECRET - will override SECRET
 * JWT_AUDIENCE - will override AUDIENCE
-
+* JWKS_URL - will override JWKS_URL
+* GROUPS_CLAIM - will override GROUPS_CLAIM
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
