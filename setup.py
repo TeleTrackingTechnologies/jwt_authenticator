@@ -13,7 +13,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/TeleTrackingTechnologies/jwt_authenticator",
     packages=['jwt_authenticator'],
-    install_requires=['Flask', 'python-jose'],
+    install_requires=['Flask', 'pyjwt', 'cryptography'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
