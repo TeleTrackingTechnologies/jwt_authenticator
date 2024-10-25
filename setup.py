@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='jwt_authenticator',
-    version='1.0.0',
+    version='1.0.1',
     author="Mike Nacey",
     author_email="nobody@teletracking.com",
     description="Simple JWT token flask service security library.",
