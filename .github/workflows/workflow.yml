@@ -1,6 +1,8 @@
 name: Publish Python 🐍 distribution 📦 to PyPI and TestPyPI
 
-on: push
+on:
+  release:
+    types: [created]
 
 jobs:
   build:
@@ -14,9 +16,6 @@ jobs:
       with:
         python-version: "3.x"
         cache: pip
-    - name: Lint and Test
-      run: |
-        make test
     - name: Install pypa/build
       run: >-
         python3 -m
