@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/TeleTrackingTechnologies/jwt_authenticator.svg?branch=master)](https://travis-ci.com/TeleTrackingTechnologies/jwt_authenticator)
+[![Build Status](https://github.com/TeleTrackingTechnologies/jwt_authenticator/actions/workflows/workflow.yml/badge.svg)
 [![PyPI version](https://badge.fury.io/py/jwt-authenticator.svg)](https://badge.fury.io/py/jwt-authenticator)
 # jwt_authenticator
 
