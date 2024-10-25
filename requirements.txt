@@ -1,11 +1,6 @@
 flask
-setuptools
-wheel
-tqdm
-twine
 pylint
 coverage
 bumpversion
 pyjwt
 cryptography
-bumpversion
