@@ -17,6 +17,8 @@ jobs:
 
     - name: Set up Python
       run: uv python install
+    - name: Install Dependencies
+      run: make install
     - name: Lint
       run: make lint
     - name: Test
