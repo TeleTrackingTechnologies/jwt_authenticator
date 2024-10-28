@@ -1,11 +1,7 @@
 
-[build-system]
-requires = ['setuptools']
-build-backend = 'setuptools.build_meta'
-
 [project]
 name = "jwt-authenticator"
-version = "1.0.8"
+dynamic = ["version"]
 authors = [{ name = "Mike Nacey", email = "nobody@teletracking.com"}]
 description = "Simple JWT token flask service security library."
 readme = "README.md"
@@ -39,3 +35,15 @@ dev = [
     "pytest>=8.3.3",
     "ruff>=0.7.1",
 ]
+
+[build-system]
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[tool.uv-dynamic-versioning]
+enable = true
+vcs = "git"
+style = "semver"
