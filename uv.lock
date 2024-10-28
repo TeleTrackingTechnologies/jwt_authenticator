@@ -328,16 +328,12 @@ wheels = [
 
 [[package]]
 name = "jwt-authenticator"
-version = "1.0.8"
+version = "1.0.8.post5+d6620c3"
 source = { editable = "." }
 dependencies = [
+    { name = "cryptography" },
     { name = "flask" },
     { name = "pyjwt" },
-]
-
-[package.optional-dependencies]
-rsa = [
-    { name = "cryptography" },
 ]
 
 [package.dependency-groups]
@@ -353,9 +349,9 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "cryptography", marker = "extra == 'rsa'", specifier = ">42.0.0" },
-    { name = "flask" },
-    { name = "pyjwt" },
+    { name = "cryptography", specifier = ">=43.0.3" },
+    { name = "flask", specifier = ">=3.0.3" },
+    { name = "pyjwt", specifier = ">=2.9.0" },
 ]
 
 [package.metadata.dependency-groups]

@@ -15,12 +15,10 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "flask",
-    "pyjwt"
+    "cryptography>=43.0.3",
+    "flask>=3.0.3",
+    "pyjwt>=2.9.0",
 ]
-
-[project.optional-dependencies]
-RSA = ["cryptography>42.0.0"]
 
 [project.urls]
 "Source" = "https://github.com/TeleTrackingTechnologies/jwt_authenticator"
