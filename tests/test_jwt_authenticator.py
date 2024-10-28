@@ -76,7 +76,7 @@ class JwtAuthenticatorTests(unittest.TestCase):
 
         audience = 'http://www.service.wingdings.com/'
         roles = {'group': ['admin', 'user'], 'aud': audience,
-                 'exp': datetime.datetime.utcnow() - datetime.timedelta(minutes=15)}
+                 'exp': datetime.datetime.now(datetime.UTC) - datetime.timedelta(minutes=15)}
         secret = secrets.token_urlsafe(32)
 
         token = AuthenticationHandler.generate_auth_token(roles, secret)
