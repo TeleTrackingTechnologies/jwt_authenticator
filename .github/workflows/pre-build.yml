@@ -9,11 +9,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
       with:
-        python-version: "3.x"
-        cache: pip
-    - name: Lint and Test
-      run: |
-        make test
+        enable-cache: true
+        cache-dependency-glob: "uv.lock"
+
+    - name: Set up Python
+      run: uv python install
+    - name: Lint
+      run: make lint
+    - name: Test
+      run: make test

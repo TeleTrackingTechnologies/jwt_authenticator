@@ -20,12 +20,6 @@ test: install
 package:
 	@uv build
 
-publish-test:
-	@uv publish --publish-url https://test.pypi.org/legacy/
-
-publish: package
-	@uv publish
-
 clean:
 	@rm -rf .venv
 
