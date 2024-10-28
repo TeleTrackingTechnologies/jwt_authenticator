@@ -1,6 +1,0 @@
-flask
-pylint
-coverage
-bumpversion
-pyjwt
-cryptography
