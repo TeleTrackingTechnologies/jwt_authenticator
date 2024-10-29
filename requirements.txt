@@ -1,9 +1,0 @@
-flask
-setuptools
-wheel
-tqdm
-twine
-python-jose
-pylint
-coverage
-bumpversion
