@@ -3,6 +3,7 @@ import json
 import os
 import secrets
 import unittest
+from datetime import timezone
 
 from flask import Flask
 from jwt.utils import base64url_encode
@@ -76,7 +77,7 @@ class JwtAuthenticatorTests(unittest.TestCase):
 
         audience = 'http://www.service.wingdings.com/'
         roles = {'groups': ['admin', 'user'], 'aud': audience,
-                 'exp': datetime.datetime.now(datetime.UTC) - datetime.timedelta(minutes=15)}
+                 'exp': datetime.datetime.now(timezone.utc) - datetime.timedelta(minutes=15)}
         secret = secrets.token_urlsafe(32)
 
         token = AuthenticationHandler.generate_auth_token(roles, secret)
