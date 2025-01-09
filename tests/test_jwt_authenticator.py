@@ -37,7 +37,7 @@ class JwtAuthenticatorTests(unittest.TestCase):
         ctx.push()
 
         audience = 'http://www.service.wingdings.com/'
-        roles = {'group': ['admin', 'user'], 'aud': audience}
+        roles = {'groups': ['admin', 'user'], 'aud': audience}
         secret = secrets.token_urlsafe(32)
 
         token = AuthenticationHandler.generate_auth_token(roles, secret)
@@ -46,8 +46,8 @@ class JwtAuthenticatorTests(unittest.TestCase):
             audience=audience,
             algorithms=["HS256"]
         )
-        self.assertTrue(decoded_token['group'][0] == 'admin')
-        self.assertTrue(decoded_token['group'][1] == 'user')
+        self.assertTrue(decoded_token['groups'][0] == 'admin')
+        self.assertTrue(decoded_token['groups'][1] == 'user')
 
     def test_generate_and_validate_token_512_success(self):
         """ Generate and decode a token using a different algorithm"""
@@ -59,7 +59,7 @@ class JwtAuthenticatorTests(unittest.TestCase):
         ctx.push()
 
         audience = 'http://www.service.wingdings.com/'
-        roles = {'group': ['admin', 'user'], 'aud': audience}
+        roles = {'groups': ['admin', 'user'], 'aud': audience}
         secret = secrets.token_urlsafe(32)
 
         token = AuthenticationHandler.generate_auth_token(roles, secret,
@@ -68,14 +68,14 @@ class JwtAuthenticatorTests(unittest.TestCase):
             token=token, key=secret,
             audience=audience, algorithms=["HS512"]
         )
-        self.assertTrue(decoded_token['group'][0] == 'admin')
-        self.assertTrue(decoded_token['group'][1] == 'user')
+        self.assertTrue(decoded_token['groups'][0] == 'admin')
+        self.assertTrue(decoded_token['groups'][1] == 'user')
 
     def test_validate_token_expired(self):
         """ Expired tokens should throw exceptions"""
 
         audience = 'http://www.service.wingdings.com/'
-        roles = {'group': ['admin', 'user'], 'aud': audience,
+        roles = {'groups': ['admin', 'user'], 'aud': audience,
                  'exp': datetime.datetime.now(datetime.UTC) - datetime.timedelta(minutes=15)}
         secret = secrets.token_urlsafe(32)
 
@@ -90,7 +90,7 @@ class JwtAuthenticatorTests(unittest.TestCase):
         """ A role is specified and not matched"""
 
         audience = 'http://www.service.wingdings.com/'
-        roles = {'group': ['admin', 'user'], 'aud': audience}
+        roles = {'groups': ['admin', 'user'], 'aud': audience}
         secret = secrets.token_urlsafe(32)
 
         token = AuthenticationHandler.generate_auth_token(roles, secret)
@@ -109,15 +109,15 @@ class JwtAuthenticatorTests(unittest.TestCase):
         ctx.push()
 
         audience = 'http://www.service.wingdings.com/'
-        roles = {'group': ['admin', 'user'], 'aud': audience}
+        roles = {'groups': ['admin', 'user'], 'aud': audience}
         secret = secrets.token_urlsafe(32)
 
         token = AuthenticationHandler.generate_auth_token(roles, secret)
         decoded_token = AuthenticationHandler.validate_and_decode_token(
             token=token, key=secret, role_name="admin",
             audience=audience)
-        self.assertTrue(decoded_token['group'][0] == 'admin')
-        self.assertTrue(decoded_token['group'][1] == 'user')
+        self.assertTrue(decoded_token['groups'][0] == 'admin')
+        self.assertTrue(decoded_token['groups'][1] == 'user')
 
     def test_invalid_token_secret_mismatch(self):
         """ Make sure invalid tokens are rejected"""
@@ -181,7 +181,7 @@ class JwtAuthenticatorTests(unittest.TestCase):
 
         jwks_url = f"file://{key_path}"
         audience = 'http://www.service.wingdings.com/'
-        roles = {'group': ['admin', 'user'], 'aud': audience}
+        roles = {'groups': ['admin', 'user'], 'aud': audience}
         token = AuthenticationHandler.generate_auth_token(roles, private_key, "RS256",
                                                           headers={"kid": "kid1"})
 

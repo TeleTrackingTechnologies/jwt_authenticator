@@ -117,7 +117,7 @@ class AuthenticationHandler:
             @wraps(func)
             def func_wrapper(*args, **kwargs):
                 try:
-                    token = request.headers.get("Authorization", None)
+                    token = request.headers.get("Authorization", None).split(" ")[1]
                     if not token:
                         abort(401, description="No token")
 
