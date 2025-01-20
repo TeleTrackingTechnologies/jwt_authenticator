@@ -30,9 +30,6 @@ class AuthenticationHandler:
         This method should be called during your application's construction.
          """
 
-        if "GROUPS_CLAIM" not in flask_app.config:
-            flask_app.config["GROUPS_CLAIM"] = "groups"
-
         env_secret = os.getenv('JWT_SECRET')
         env_audience = os.getenv('JWT_AUDIENCE')
         env_jwks_url = os.getenv('JWKS_URL')
@@ -80,13 +77,16 @@ class AuthenticationHandler:
                 audience=audience,
                 algorithms=algorithms)
 
-            roles = claim_set[app.config["GROUPS_CLAIM"]]
-            if role_name:
-                matching_roles = list(
-                    filter(lambda x: x.lower() == role_name.lower(), roles))
-                if not matching_roles:
-                    raise AuthError({"code": "unauthorized",
-                                     "description": "not authorized"}, 401)
+            group_claims = app.config.get("GROUPS_CLAIM", None)
+            if group_claims is not None:
+                roles = claim_set[group_claims]
+
+                if role_name:
+                    matching_roles = list(
+                        filter(lambda x: x.lower() == role_name.lower(), roles))
+                    if not matching_roles:
+                        raise AuthError({"code": "unauthorized",
+                                        "description": "not authorized"}, 401)
         except jwt.ExpiredSignatureError as ex:
             raise AuthError({"code": "token_expired",
                              "description": "token is expired"}, 401) from ex
