@@ -233,3 +233,25 @@ class JwtAuthenticatorTests(unittest.TestCase):
                             "JWKS url not match")
         finally:
             ctx.pop()
+
+    def test_validate_token_without_role_group(self):
+        """Decode token that does not have role groups"""
+
+        app = Flask('test.cfg')
+        app.config.from_pyfile(f"{self.this_path}/config.py")
+        app.config.pop('GROUPS_CLAIM')
+
+        ctx = app.app_context()
+        ctx.push()
+
+        audience = 'http://www.service.wingdings.com/'
+        claims = {'aud': audience}
+        secret = secrets.token_urlsafe(32)
+
+        token = AuthenticationHandler.generate_auth_token(claims, secret)
+        decoded_token = AuthenticationHandler.validate_and_decode_token(
+            token=token, key=secret,
+            audience=audience,
+            algorithms=["HS256"]
+        )
+        self.assertTrue(decoded_token['aud'] == audience)
